@@ -95,7 +95,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>de.codecentric</groupId>
                 <artifactId>jmeter-graph-maven-plugin</artifactId>
                 <version>0.1.0</version>
@@ -107,42 +107,42 @@
                             <goal>create-graph</goal>
                         </goals>
                         <configuration>
-                            <!-- <inputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/*.jtl</inputFile> -->
+                            <inputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/*.jtl</inputFile>
                             <inputFile>${project.build.directory}/jmeter/results/*.csv</inputFile>
                             <graphs>
                                 <graph>
                                     <pluginType>ThreadsStateOverTime</pluginType>
                                     <width>800</width>
                                     <height>600</height>
-                                    <!-- <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/ThreadsStateOverTime.png</outputFile> -->
+                                    <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/ThreadsStateOverTime.png</outputFile>
                                     <outputFile>${project.build.directory}/jmeter/results/graphs/ThreadsStateOverTime.png</outputFile>
                                 </graph>
                                 <graph>
                                     <pluginType>LatenciesOverTime</pluginType>
                                     <width>800</width>
                                     <height>600</height>
-                                    <!-- <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/LatenciesOverTime.png</outputFile> -->
+                                    <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/LatenciesOverTime.png</outputFile>
                                     <outputFile>${project.build.directory}/jmeter/results/graphs/LatenciesOverTime.png</outputFile>
                                 </graph>
                                 <graph>
                                     <pluginType>HitsPerSecond</pluginType>
                                     <width>800</width>
                                     <height>600</height>
-                                    <!-- <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/HitsPerSecond.png</outputFile> -->
+                                    <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/HitsPerSecond.png</outputFile>
                                     <outputFile>${project.build.directory}/jmeter/results/graphs/HitsPerSecond.png</outputFile>
                                 </graph>
                                 <graph>
                                     <pluginType>ResponseCodesPerSecond</pluginType>
                                     <width>800</width>
                                     <height>600</height>
-                                    <!-- <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/ResponseCodesPerSecond.png</outputFile> -->
+                                    <outputFile>${project.build.directory}/jmeter/results/${maven.build.timestamp}/graphs/ResponseCodesPerSecond.png</outputFile>
                                     <outputFile>${project.build.directory}/jmeter/results/graphs/ResponseCodesPerSecond.png</outputFile>
                                 </graph>                               
                             </graphs>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
         </plugins>
     </build>
 </project>
