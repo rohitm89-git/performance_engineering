@@ -47,6 +47,7 @@
                     <skipTests>false</skipTests>
                     <errorRateThresholdInPercent>1</errorRateThresholdInPercent>
                     <generateReports>true</generateReports>
+                    <resultsDirectory>/jsonFile</resultsDirectory>
                     <!--<resultsDirectory>${project.build.directory}/jmeter/results/${maven.build.timestamp}/</resultsDirectory> -->
 
                     <propertiesUser>
