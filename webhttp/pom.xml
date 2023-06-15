@@ -27,7 +27,7 @@
                 <version>2.9.0</version>
 
                 <configuration>
-                    <jmeterVersion>5.0</jmeterVersion>
+                    <jmeterVersion>5.5</jmeterVersion>
 
                     <!--jmeterExtensions is for adding extra components that you have used in the test plan-->
                     <jmeterExtensions>
