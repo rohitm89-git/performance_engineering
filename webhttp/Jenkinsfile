@@ -57,12 +57,12 @@ pipeline {
             }
         }
         
-        stage('publish-performance-trend-report'){
-            steps{
-                // perfReport sourceDataFiles: "**/*.csv", compareBuildPrevious: true, graphType: "Percentile Response Time", showTrendGraphs: true
-                perfReport filterRegex: "", graphType: "PRT", percentiles: "90,95,99", showTrendGraphs: true, sourceDataFiles: "**/*.csv", compareBuildPrevious: true
-            }
-        }
+        // stage('publish-performance-trend-report'){
+        //     steps{
+        //         // perfReport sourceDataFiles: "**/*.csv", compareBuildPrevious: true, graphType: "Percentile Response Time", showTrendGraphs: true
+        //         perfReport filterRegex: "", graphType: "PRT", percentiles: "90,95,99", showTrendGraphs: true, sourceDataFiles: "**/*.csv", compareBuildPrevious: true
+        //     }
+        // }
         
         stage('clear workspace'){
             steps{
