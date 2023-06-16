@@ -27,7 +27,7 @@
                 <version>2.9.0</version>
 
                 <configuration>
-                    <jmeterVersion>5.0</jmeterVersion>
+                    <!-- <jmeterVersion>5.0</jmeterVersion> -->
 
                     <!--jmeterExtensions is for adding extra components that you have used in the test plan-->
                     <jmeterExtensions>
@@ -39,15 +39,15 @@
 
                     <downloadExtensionDependencies>true</downloadExtensionDependencies>
 
-                    <resultsFileFormat>xml</resultsFileFormat>
+                    <!-- <resultsFileFormat>xml</resultsFileFormat>
                     <appendResultsTimestamp>true</appendResultsTimestamp>
                     <testResultsTimestamp>false</testResultsTimestamp>
                     <resultsFileNameDateFormat>yyyyMMdd-HHmmss</resultsFileNameDateFormat>
                     <ignoreResultFailures>true</ignoreResultFailures>
                     <skipTests>false</skipTests>
-                    <errorRateThresholdInPercent>1</errorRateThresholdInPercent>
+                    <errorRateThresholdInPercent>1</errorRateThresholdInPercent> -->
                     <generateReports>true</generateReports>
-                    <resultsDirectory>/jsonFile</resultsDirectory>
+                    <!-- <resultsDirectory>/jsonFile</resultsDirectory> -->
                     <!--<resultsDirectory>${project.build.directory}/jmeter/results/${maven.build.timestamp}/</resultsDirectory> -->
 
                     <propertiesUser>
