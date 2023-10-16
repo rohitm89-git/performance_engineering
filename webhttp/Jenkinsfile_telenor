@@ -1,0 +1,134 @@
+library 'stable'
+import groovy.io.FileVisitResult
+import groovy.io.FileType
+
+pipeline {
+  agent {
+    docker {
+      label 'performance'
+      image 'maven:3.6.3-jdk-11'
+      args containerSettings()
+      reuseNode true
+    }
+  }
+
+  parameters {
+    string name: 'landingPageThreads', defaultValue: '1',
+      description: 'Provide number of users to hit service concurrently'
+    string name: 'detailPageThreads', defaultValue: '1',
+      description: 'Provide number of users to hit service concurrently'
+    string name: 'purchaseOrderThreads', defaultValue: '1',
+      description: 'Provide number of users to hit service concurrently'
+    string name: 'rampup', defaultValue: '2',
+      description: 'ramp up time in secs'
+    string name: 'duration' defaultValue: '300',
+      description: 'duration for which the test will execute'
+    gitParameter branchFilter: 'origin/(.*)', defaultValue: 'eOne-GUI', selectedValue: 'DEFAULT', name: 'BRANCH', type: 'PT_BRANCH',listSize: '0', sortMode: 'ASCENDING_SMART', quickFilterEnabled: true
+  }
+
+  options {
+    timestamps()
+  }
+
+  stages {
+    stage('Build and Test') {
+      steps {
+        withMaven {
+          sh 'mvn clean verify -fn -DlandingPageThreads=${landingPageThreads} -DdetailPageThreads=${detailPageThreads} -DpurchaseOrderThreads=${purchaseOrderThreads} -Drampup=${rampup} -Dduration=${duration}'
+        }
+      }
+    }
+    stage('Archive Test Report') {
+      steps {
+        //Copy files to single folder and zip
+        script {
+          def sourceDir = "${WORKSPACE}/target/jmeter/results/";
+          def targetDir = "${WORKSPACE}/target/jmeter/reports";
+
+          //copy result csv file to target dir
+          copy_status = sh(
+            script:
+              "find ${sourceDir} -iname '*.csv' | xargs cp -t ${targetDir}/; ",
+              returnStatus: true
+          )
+          echo "copy status: ${copy_status}"
+
+          //copy dashboard.js file to source dir
+          copy_js = sh(
+            script:
+              "find ${targetDir} -iname 'dashboard.js' | xargs cp -t ${sourceDir}/; ",
+              returnStatus: true
+          )
+          echo "copy status: ${copy_js}"
+
+          //copy statistics.json file to source dir
+          copy_json = sh(
+            script:
+              "find ${targetDir} -iname 'statistics.json' | xargs cp -t ${sourceDir}/; ",
+              returnStatus: true
+          )
+          echo "copy status: ${copy_json}"
+
+          //copy TraceReport to target dir
+          sh "find ${WORKSPACE}/target/ -iname 'Trace*.csv' | xargs cp -t ${targetDir}/"
+        }
+        zip zipFile: ("report-${env.BUILD_NUMBER}.zip"), dir: 'target/jmeter/reports', archive: true
+      }
+    }
+    stage('Report to SPICE') {
+      steps {
+        script {
+          //parse apdex data from dashboard.js and write to a file: apdex.json
+          sh """#!/bin/bash
+            awk -FapdexTable '/apdexTable/ { print \$2 }' target/jmeter/results/dashboard.js | awk -F, '{ for (x=2; x<(NF-1); x++) {printf \$x ","} print "\\n"}' | awk '1' RS='.\\n' > apdex.json"""
+
+          def apdexDataJson = readJSON text: readFile(file: 'apdex.json')
+          def apdexData = ["apdex": []]
+          def apdexDataKeys = ["Apdex", "T", "F", "label"]
+
+          //Create a map for overall apdex and add to the data set
+          def mapOverall = [:]
+          apdexDataKeys.eachWithIndex { key, index -> mapOverall[key] = apdexDataJson.overall.data[index] }
+          apdexData.apdex << mapOverall
+
+          //Create a map for each test case and add to the data set
+          apdexDataJson.items.each { item -> 
+            def mapItem = [:]
+            apdexDataKeys.eachWithIndex {key, index -> 
+              mapItem[key] = item.data[index]
+            }
+            apdexData.apdex << mapItem
+          }
+
+          //Read statistics from the file statistics.json
+          def statsDataJson = readJSON text: readFile(file: "target/jmeter/results/statistics.json")
+
+          //convert to a format accepted by spice
+          def statsData = statsDataJson.inject(["statistics": []]) {data, key, val ->
+            data.statistics << val
+            return data
+          }
+
+          //combine apdex and statistics
+          def allData = apdexData + statsData
+
+          //write to a file for later reference and archive
+          writeJSON file: 'alldata.json', json: allData. pretty: 4
+          archiveArtifacts artifacts: 'alldata.json'
+
+          //report to spice
+          def allDataJsonString = groovy.json.JsonOutput.toJson(allData)
+          def url = 'http://spice-observer.paas-test.se......./report/jmeter'
+            httpRequest([
+              url: url
+              customHeaders: [[name, 'Content-Type', value: 'application/json']],
+              httpMode: 'POST',
+              quite: true,
+              validResponseCodes: "200:600",
+              requestBody: allDataJsonString
+            ])
+        }
+      }
+    }
+  }
+}
